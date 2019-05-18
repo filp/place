@@ -95,7 +95,7 @@ export async function setLightStateByName (lightName, stateBool) {
 export async function alertLightByName (lightName) {
   const light = await getLightByName(lightName)
 
-  return hue.setLightState(light.id, state.shortAlert()).then(() => {
+  return hue.setLightState(light.id, state.copy().shortAlert()).then(() => {
     bus.emit('hue:lights:light:alert', lightName)
   })
 }
