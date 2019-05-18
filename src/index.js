@@ -1,0 +1,43 @@
+import config from 'config'
+import express from 'express'
+import multer from 'multer'
+import bodyParser from 'body-parser'
+import bus from './bus'
+import handlers from './handlers'
+import logger from './logger'
+
+const port = config.get('server.port')
+const app = express()
+
+app.use(multer().none())
+app.use(bodyParser.json())
+
+app.post('/hooks/plex', async (req, res) => {
+  const payload = JSON.parse(req.body.payload)
+
+  bus.emit(`plex:${payload.event}`, payload)
+
+  res.end()
+})
+
+app.get('/state', async (req, res) => {
+  res.status(200).json(await handlers.collectState())
+})
+
+app.post('/command', async (req, res) => {
+  bus.emit(`command:${req.body.command}`, req.body)
+
+  res.status(200).json(await handlers.collectState())
+})
+
+app.listen(port, () => {
+  logger.info({ port }, 'home server started')
+
+  // Run work loops immediately at startup, as soon as the server is listening:
+  bus.emit('work:occasional')
+})
+
+// Setup work loops:
+setInterval(() => {
+  bus.emit('work:occasional')
+}, 30000)
