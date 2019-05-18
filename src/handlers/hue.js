@@ -6,6 +6,11 @@ bus.on('command:hue:light:state', async (commandOpts) => {
   await setLightStateByName(commandOpts.name, commandOpts.state)
 })
 
+bus.on('command:hue:group:state', async (commandOpts) => {
+  console.log('set group state', commandOpts)
+  await setGroupStateByName(commandOpts.name, commandOpts.state)
+})
+
 const hue = new HueApi(config.get('hue.bridge'), config.get('hue.username'))
 const state = lightState.create()
 const sensorTypes = {
@@ -80,7 +85,7 @@ export async function setLightStateByName (lightName, stateBool) {
   const newLightState = booleanState(stateBool).copy()
 
   return hue.setLightState(light.id, newLightState).then(() => {
-    bus.emit(`hue:lights:group:${stateBool ? 'on' : 'off'}`, lightName)
+    bus.emit(`hue:lights:light:${stateBool ? 'on' : 'off'}`, lightName)
   })
 }
 

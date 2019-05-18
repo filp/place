@@ -1,11 +1,9 @@
 import config from 'config'
 import bus from '../bus'
-import { setGroupStateByName } from './hue'
 
 let lastPayload = null
 
 const theaterConfig = config.get('theater')
-const schedule = theaterConfig.schedule.split('-').map(h => +h)
 
 bus.on('plex:media.pause', handleTheaterState)
 bus.on('plex:media.stop', handleTheaterState)
@@ -13,13 +11,6 @@ bus.on('plex:media.resume', handleTheaterState)
 
 function isTheaterPlayer (payload) {
   return payload.Player.title === theaterConfig.plex.player
-}
-
-function isWithinSchedule () {
-  const now = new Date()
-  const hour = now.getHours()
-
-  return hour >= schedule[0] && hour < schedule[1]
 }
 
 function lastPlayedMedia () {
@@ -45,15 +36,6 @@ function lastPlayedMedia () {
   }
 }
 
-async function setLights (actionConfig) {
-  if (!actionConfig) return
-
-  return setGroupStateByName(
-    actionConfig.group,
-    actionConfig.state
-  )
-}
-
 async function handleTheaterState (payload) {
   const event = payload.event
   const active = event === 'media.resume'
@@ -63,18 +45,14 @@ async function handleTheaterState (payload) {
   }
 
   if (!isTheaterPlayer(payload)) return
-  if (!isWithinSchedule()) return
-
-  await setLights(active ? theaterConfig.start : theaterConfig.stop)
+  bus.emit(`theater:${event.replace('.', ':')}`, payload)
 }
 
 export default {
   name: 'theater',
   async collectState () {
     return {
-      inSchedule: isWithinSchedule(),
-      lastMedia: lastPlayedMedia(),
-      config: theaterConfig
+      lastMedia: lastPlayedMedia()
     }
   }
 }

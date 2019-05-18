@@ -37,10 +37,8 @@ function checkConditions (rule) {
 }
 
 function runRule (rule, triggerArgs) {
-  const conditionsResult = checkConditions(rule)
-
   // If the rule does not meet the required conditions, do nothing:
-  if (!conditionsResult) return
+  if (rule.conditions && !checkConditions(rule)) return
 
   rule.actions.forEach(a => {
     if (a.flag) {
@@ -61,12 +59,12 @@ function runRule (rule, triggerArgs) {
 // Enable rules on first run:
 if (rules) {
   rules.forEach(rule => {
-    bus.on(rule.trigger, (...triggerArgs) => runRule(rule, triggerArgs))
-    logger.info({ name: rule.name, trigger: rule.trigger }, 'registered rule')
+    rule.triggers.forEach(t => bus.on(t, (...triggerArgs) => runRule(rule, triggerArgs)))
+    logger.info({ name: rule.name, triggers: rule.triggers }, 'registered rule')
   })
 }
-
 export default {
+
   name: 'rules',
   async collectState () {
     return {
@@ -74,15 +72,3 @@ export default {
     }
   }
 }
-
-/*  
-- description: Turn on bloom behind Gaming PC when it's active after 7PM
-  trigger: network: device: gaming - pc: present
-  conditions:
-  time: "20:00-23:59"
-  action:
-  - flag: gaming - pc - bloom - toggle
-  set: true
-    - run: command: hue: lights: Bloom: state
-      state: true
-*/
