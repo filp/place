@@ -5,6 +5,15 @@ import logger from '../logger'
 
 const rules = config.get('rules')
 let flags = {}
+let lastRuleExecuted = null
+
+bus.on('rules:run', rule => {
+  lastRuleExecuted = {
+    name: rule.name,
+    description: rule.description,
+    triggers: rule.triggers
+  }
+})
 
 const conditionHandlers = {
   time (rule, range) {
@@ -68,7 +77,7 @@ export default {
   name: 'rules',
   async collectState () {
     return {
-      rules
+      lastRun: lastRuleExecuted
     }
   }
 }

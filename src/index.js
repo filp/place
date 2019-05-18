@@ -30,6 +30,12 @@ app.post('/command', async (req, res) => {
   res.status(200).json(await handlers.collectState())
 })
 
+app.post('/command/:command', async (req, res) => {
+  bus.emit(`command:${req.params.command}`, req.body)
+
+  res.status(200).json(await handlers.collectState())
+})
+
 app.listen(port, () => {
   logger.info({ port }, 'home server started')
 
@@ -40,4 +46,4 @@ app.listen(port, () => {
 // Setup work loops:
 setInterval(() => {
   bus.emit('work:occasional')
-}, 30000)
+}, 45000)

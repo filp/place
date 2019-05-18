@@ -7,8 +7,11 @@ bus.on('command:hue:light:state', async (commandOpts) => {
 })
 
 bus.on('command:hue:group:state', async (commandOpts) => {
-  console.log('set group state', commandOpts)
   await setGroupStateByName(commandOpts.name, commandOpts.state)
+})
+
+bus.on('command:hue:light:alert', async (commandOpts) => {
+  await alertLightByName(commandOpts.name)
 })
 
 const hue = new HueApi(config.get('hue.bridge'), config.get('hue.username'))
@@ -86,6 +89,14 @@ export async function setLightStateByName (lightName, stateBool) {
 
   return hue.setLightState(light.id, newLightState).then(() => {
     bus.emit(`hue:lights:light:${stateBool ? 'on' : 'off'}`, lightName)
+  })
+}
+
+export async function alertLightByName (lightName) {
+  const light = await getLightByName(lightName)
+
+  return hue.setLightState(light.id, state.shortAlert()).then(() => {
+    bus.emit('hue:lights:light:alert', lightName)
   })
 }
 
