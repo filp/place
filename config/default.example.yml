@@ -1,0 +1,80 @@
+hue:
+  bridge: 0.0.0.0
+  username: bridge-password
+  
+server:
+  port: 8888
+
+rules:
+  - name: bloom-on-desktop
+    description: Turn on bloom behind Gaming PC when it's active after 7PM
+    triggers:
+      - network:device:gaming-pc:present
+      - network:device:gaming-pc:enter
+    conditions:
+      time:
+        from: { hour: 19, minute: 0 }
+        to: { hour: 7, minute: 0 }
+    actions:
+      - flag: gaming-pc-bloom-toggle
+        set: true
+      - run: command:hue:light:state
+        state: true
+        name: Bloom
+
+  - name: bloom-off-desktop
+    description: Turn off bloom behind Gaming PC when it's not in use, if the previous rule turned it on
+    triggers:
+      - network:device:gaming-pc:exit
+    conditions:
+      flag:
+        present: gaming-pc-bloom-toggle
+    actions:
+      - flag: gaming-pc-bloom-toggle
+        set: false
+      - run: command:hue:light:state
+        state: false
+        name: Bloom
+
+  - name: theater-on-start
+    description: Turn off the lights in the living room when playing something on the chromecast/plex
+    triggers:
+      - theater:media:resume
+    actions:
+      - run: command:hue:group:state
+        name: Living Room Ambient
+        state: false
+
+  - name: theater-on-stop
+    description: Turn on the lights in the living room when pausing or stopping something on the chromecast/plex
+    triggers:
+      - theater:media:stop
+      - theater:media:pause
+    conditions:
+      time:
+        from: { hour: 19, minute: 0 }
+        to: { hour: 23, minute: 59 }
+    actions:
+      - run: command:hue:group:state
+        name: Living Room Ambient
+        state: true
+
+network:
+  scanOn: 'work:occasional'
+  deviceNames:
+    aa:00:bb:00:cc:00:
+      name: gaming-pc
+      description: Gaming PC
+      location: Living room
+      type: desktop
+
+pihole:
+  host: 0.0.0.0
+  token: pihole-token
+
+cast:
+  device: 4K Projector
+
+theater:
+  plex:
+    player: 'Chromecast'

@@ -24,7 +24,26 @@ to accomodate other users besides myself.
 - Pihole support
 - Network discovery-based presence detection, including enter/exit detection
 - Extensive events you can hook into to automate various features
-- Flexible rule system (see `config/default.example.yml`) around the above mentioned events
+- Flexible rule system (see `config/default.example.yml`, or the example below) around the above mentioned events
+
+## Example rule configuration
+
+```yaml
+rules:
+  - name: theater-on-stop
+    description: Turn on the lights in the living room when pausing or stopping something on the chromecast/plex
+    triggers:
+      - theater:media:stop
+      - theater:media:pause
+    conditions:
+      time:
+        from: { hour: 19, minute: 0 }
+        to: { hour: 23, minute: 59 }
+    actions:
+      - run: command:hue:group:state
+        name: Living Room Ambient
+        state: true
+```
 
 ## Setup
 
