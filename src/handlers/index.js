@@ -9,7 +9,8 @@ const availableModules = [
   'cast',
   'pihole',
   'network',
-  'rules'
+  'rules',
+  'pushover'
 ]
 
 // Dynamically load only modules described in configuration
@@ -28,7 +29,7 @@ export default {
     let state = {}
 
     for (const handler of activeModules) {
-      state[handler.name] = await handler.collectState()
+      state[handler.default.name] = await handler.default.collectState()
     }
 
     bus.emit('home:state', state)

@@ -78,3 +78,10 @@ cast:
 theater:
   plex:
     player: 'Chromecast'
+
+pushover:
+  user: user-token
+  defaults:
+    sound: magic
+    device: iphone
+    priority: 2
