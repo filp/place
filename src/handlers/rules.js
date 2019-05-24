@@ -7,6 +7,13 @@ const rules = config.get('rules')
 let flags = {}
 let lastRuleExecuted = null
 
+bus.on('command:rules:run', opts => {
+  const rule = rules.find(r => r.name === opts.rule)
+  const withConditions = typeof opts.enforceConditions === 'undefined' ? true : opts.enforceConditions
+
+  runRule(rule, opts, withConditions)
+})
+
 bus.on('rules:run', rule => {
   lastRuleExecuted = {
     name: rule.name,
@@ -45,9 +52,9 @@ function checkConditions (rule) {
   })
 }
 
-function runRule (rule, triggerArgs) {
+function runRule (rule, triggerArgs, enforceConditions = true) {
   // If the rule does not meet the required conditions, do nothing:
-  if (rule.conditions && !checkConditions(rule)) return
+  if (rule.conditions && enforceConditions && !checkConditions(rule)) return
 
   rule.actions.forEach(a => {
     if (a.flag) {

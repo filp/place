@@ -34,7 +34,10 @@ function applyInterpolation (msg, fields, ctx) {
 export async function sendToPushover (msg) {
   const tplContext = {
     state: await handlers.collectState(),
-    self: msg
+    self: {
+      executedAt: new Date().toISOString(),
+      message: msg
+    }
   }
 
   const messageBody = applyInterpolation(

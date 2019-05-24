@@ -41,6 +41,7 @@ app.listen(port, () => {
 
   // Run work loops immediately at startup, as soon as the server is listening:
   bus.emit('work:occasional')
+  bus.emit('work:startup')
 })
 
 // Setup work loops:
