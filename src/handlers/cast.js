@@ -3,7 +3,6 @@ import { DeviceMonitor } from 'castv2-device-monitor'
 import bus from '../bus'
 
 const cast = new DeviceMonitor(config.get('cast.device'))
-const deviceTypeName = 'Chromecast'
 
 let media = null
 let application = null

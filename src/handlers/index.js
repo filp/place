@@ -1,19 +1,33 @@
-import theater from './theater'
-import hue from './hue'
-import cast from './cast'
-import pihole from './pihole'
-import network from './network'
-import rules from './rules'
+import config from 'config'
 import bus from '../bus'
+import logger from '../logger'
 
-const all = [theater, hue, cast, pihole, network, rules]
+let activeModules = []
+const availableModules = [
+  'theater',
+  'hue',
+  'cast',
+  'pihole',
+  'network',
+  'rules'
+]
+
+// Dynamically load only modules described in configuration
+for (const moduleName of availableModules) {
+  if (config[moduleName]) {
+    const mod = require(`./${moduleName}`)
+    activeModules.push(mod)
+
+    logger.info({ moduleName }, 'enabled module')
+    bus.emit('module:enable', mod)
+  }
+}
 
 export default {
-  all,
   async collectState () {
     let state = {}
 
-    for (const handler of all) {
+    for (const handler of activeModules) {
       state[handler.name] = await handler.collectState()
     }
 

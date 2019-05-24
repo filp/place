@@ -67,3 +67,16 @@ $ npm start
 $ npm run build
 $ node dist/index.js
 ```
+
+## Enabling and disabling modules
+
+Modules can be enabled or disabled based on the existence of a key in the top level of the configuration file
+with the module's name.
+
+For example, to enable the rules module, simply add a `rules` key to the configuration yaml file:
+
+```yaml
+rules: []
+```
+
+The above will enable the rules module (though since the list is empty, no actual rules will be configured).
