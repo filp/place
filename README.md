@@ -18,14 +18,15 @@ to accomodate other users besides myself.
 
 ## Features
 
+- Flexible rule system (see `config/default.example.yml`, or the example below) around the above mentioned events
+- Extensive events you can hook into to automate various features
+- Scheduling support
 - Plex support
 - Chromecast support
 - Hue lights support
 - Pihole support
 - Webhook support
 - Network discovery-based presence detection, including enter/exit detection
-- Extensive events you can hook into to automate various features
-- Flexible rule system (see `config/default.example.yml`, or the example below) around the above mentioned events
 - Push notification suppport with Pushover
 
 ## Example rule configuration
@@ -93,4 +94,4 @@ This state can be accessed in 3 different ways:
 
 - With the `/state` API endpoint, in JSON format, to be consumed by any compatible client
 - With the internal `handlers.collectState` API (or by hooking into the `home:state` event)
-- In notifications and other places where templating is supported (using `{{ state.some-module.some-value }}`)
+- In notifications and other places where templating is supported (using `{{ state.someModule.someValue }}`)

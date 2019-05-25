@@ -1,5 +1,6 @@
 import config from 'config'
 import moment from 'moment'
+import schedule from 'node-schedule'
 import bus from '../bus'
 import logger from '../logger'
 
@@ -75,8 +76,15 @@ function runRule (rule, triggerArgs, enforceConditions = true) {
 // Enable rules on first run:
 if (rules) {
   rules.forEach(rule => {
-    rule.triggers.forEach(t => bus.on(t, (...triggerArgs) => runRule(rule, triggerArgs)))
-    logger.info({ name: rule.name, triggers: rule.triggers }, 'registered rule')
+    if (rule.triggers) {
+      rule.triggers.forEach(t => bus.on(t, (...triggerArgs) => runRule(rule, triggerArgs)))
+    } else if (rule.schedule) {
+      schedule.scheduleJob(rule.schedule, () => {
+        runRule(rule, { schedule: rule.schedule })
+      })
+    }
+
+    logger.info({ name: rule.name, triggers: rule.triggers, schedule: rule.schedule }, 'registered rule')
   })
 }
 export default {
