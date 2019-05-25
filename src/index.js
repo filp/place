@@ -15,7 +15,7 @@ app.use(bodyParser.json())
 app.post('/hooks/plex', async (req, res) => {
   const payload = JSON.parse(req.body.payload)
 
-  bus.emit(`plex:${payload.event}`, payload)
+  bus.emit(`plex:${payload.event.replace('.', ':')}`, payload)
 
   res.end()
 })
@@ -39,12 +39,10 @@ app.post('/command/:command', async (req, res) => {
 app.listen(port, () => {
   logger.info({ port }, 'home server started')
 
-  // Run work loops immediately at startup, as soon as the server is listening:
-  bus.emit('work:occasional')
   bus.emit('work:startup')
 })
 
 // Setup work loops:
 setInterval(() => {
-  bus.emit('work:occasional')
+  bus.emit('work:frequent')
 }, 45000)

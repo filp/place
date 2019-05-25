@@ -5,9 +5,9 @@ let lastPayload = null
 
 const theaterConfig = config.get('theater')
 
-bus.on('plex:media.pause', handleTheaterState)
-bus.on('plex:media.stop', handleTheaterState)
-bus.on('plex:media.resume', handleTheaterState)
+bus.on('plex:media:pause', handleTheaterState)
+bus.on('plex:media:stop', handleTheaterState)
+bus.on('plex:media:resume', handleTheaterState)
 
 function isTheaterPlayer (payload) {
   return payload.Player.title === theaterConfig.plex.player

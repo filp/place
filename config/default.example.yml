@@ -60,7 +60,7 @@ rules:
         state: true
 
 network:
-  scanOn: 'work:occasional'
+  scanOn: 'work:frequent'
   deviceNames:
     aa:00:bb:00:cc:00:
       name: gaming-pc
