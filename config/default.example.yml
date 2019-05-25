@@ -6,6 +6,16 @@ server:
   port: 8888
 
 rules:
+  - name: lights-on-living-room
+    schedule: '0 20 * * *'
+    actions:
+      - run: command:pushover:send
+        message: |
+          It's 8PM, turning on living room lights automatically for you.
+      - run: command:hue:group:state
+        name: Living Room Ambient
+        state: true
+
   - name: bloom-on-desktop
     description: Turn on bloom behind Gaming PC when it's active after 7PM
     triggers:
